@@ -26,7 +26,7 @@ for name in names:
 
 # print(tag_counts)
 
-draw_pie(tag_counts)
+draw_pie(tag_counts, "pie_plot.html")
 
 # Tags covered in class in the first week
 

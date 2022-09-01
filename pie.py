@@ -9,8 +9,9 @@ import pandas as pd
 from bokeh.palettes import Category20
 from bokeh.plotting import figure, show
 from bokeh.transform import cumsum
+from bokeh.io import save
 
-def draw_pie(x):
+def draw_pie(x, save_file=None):
 
     data = pd.Series(x).reset_index(name='value').rename(columns={'index': 'element'})
     data['angle'] = data['value']/data['value'].sum() * 2*pi
@@ -36,3 +37,5 @@ def draw_pie(x):
     p.grid.grid_line_color = None
 
     show(p)
+    if save_file:
+        save(p, save_file)
