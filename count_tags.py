@@ -1,60 +1,61 @@
 import requests 
 from bs4 import BeautifulSoup
 from pie import draw_pie
+import sys
 
 # For downloading...
 url = 'https://www.minneapolis.edu' # todo fill in here
 page = requests.get(url).text
 
-# for reading from a file...
-# page = open('page.html', 'r').read()
-
+# Or, for reading from a file...
+page = open('page.html', 'r').read()
 
 soup = BeautifulSoup(page, 'html.parser')
 
 all_tags = soup.find_all(True)
 
-names = [ tag.name for tag in all_tags ]
+names = [ tag.name for tag in all_tags ]   # List comprehension
 
-tag_counts = {}
+if not names:
+    print('There are no tags in this data.')
+    sys.exit()
 
-for name in names:
-    if name in tag_counts:
-        tag_counts[name] = tag_counts[name] + 1
-    else:
-        tag_counts[name] = 1
+tag_counts = { name: names.count(name) for name in names }  # dictionary comprehension!
 
-# print(tag_counts)
+# Pie chart with frequencies for all the tags in the document 
+draw_pie(tag_counts, 'pie_plot.html')
 
-draw_pie(tag_counts, "pie_plot.html")
-
+# How many of these tags are ones we know? 
 # Tags covered in class in the first week
 
 week_1_tags = ['p', 'a', 'b', 'img', 'div', 'span', 'i', 
 'table', 'td', 'tr', 'th', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
 'link', 'html', 'body', 'title', 'head', 'li', 'ul', 'ol', 'br', 'strong']
 
-week_2_tags = ['option', 'select', 'button', 'input', 'form']
+# TODO - what about the following week? 
+week_2_tags = ['option', 'select', 'button', 'input', 'form', 'pre', 'code']
+
+known_tags = week_1_tags + week_2_tags
 
 known_vs_unknown = {
     'known': 0,
     'unknown': 0
 }
 
-unknown_set = set()
+# Set comprehensions 
+unknown_set = { name for name in names if name not in known_tags }
 
 for name in names:
-    if name in week_1_tags:
+    if name in known_tags:
         known_vs_unknown['known'] += 1
     else:
-        unknown_set.add(name)
         known_vs_unknown['unknown'] += 1
 
 print(f'unknown tags: {unknown_set}')
 print(known_vs_unknown)
 
 if known_vs_unknown['known'] + known_vs_unknown['unknown'] == 0:
-    # no tags!
+    # avoid possible divide by zero error 
     print('There are no tags.')
 else:
     percentage_known = known_vs_unknown['known'] / ( known_vs_unknown['known'] + known_vs_unknown['unknown'] )  * 100
