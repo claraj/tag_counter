@@ -11,19 +11,21 @@ from bokeh.plotting import figure, show
 from bokeh.transform import cumsum
 from bokeh.io import save
 
-def draw_pie(x, save_file=None):
+def draw_pie(tag_frequency, save_file_name=None):
+    """ Use bokeh to draw a pie chart of frequencies of HTML element tags
+    Optionally save plot to file """
 
-    data = pd.Series(x).reset_index(name='value').rename(columns={'index': 'element'})
+    data = pd.Series(tag_frequency).reset_index(name='value').rename(columns={'index': 'element'})
     data['angle'] = data['value']/data['value'].sum() * 2*pi
 
-    data_point_count = len(x)
+    data_point_count = len(tag_frequency)
     biggest_pallete = Category20[len(Category20) - 1]
     pallete_len = len(biggest_pallete)
     repeats = (int( data_point_count / pallete_len )) + 1
     pallete = biggest_pallete * repeats
-    pallete = pallete[:len(x)]  # slice len of data 
+    pallete = pallete[:len(tag_frequency)]  # slice len of data 
 
-    data['color'] = pallete#['#23f423'] * len(x) # A list of color values, one per data point
+    data['color'] = pallete
 
     p = figure(height=1000, title="Pie Chart", toolbar_location=None,
             tools="hover", tooltips="@element: @value", x_range=(-0.5, 1.0))
@@ -37,5 +39,6 @@ def draw_pie(x, save_file=None):
     p.grid.grid_line_color = None
 
     show(p)
-    if save_file:
-        save(p, save_file)
+
+    if save_file_name:
+        save(p, save_file_name)
